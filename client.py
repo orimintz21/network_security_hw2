@@ -1,25 +1,41 @@
+# based on https://docs.python.org/3/library/socket.html
 import sys
 import socket
 
-
-def main():
-    if len(sys.argv) != 3:
-        print("Usage: python3 client.py <host> <port>")
-        sys.exit(1)
+host = None
+port = None
+# Get the host and port number from the command line arguments
+if len(sys.argv) != 3:
+    print("Usage: python3 client.py <host> <port>")
+    sys.exit(1)
+else:
     host = sys.argv[1]
     port = int(sys.argv[2])
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    server_address = (host, port)
-    sock.connect(server_address)
-
+# Connect to the server and send a GET request
+for res in socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
+    af, socktype, proto, canonname, sa = res
+    try:
+        sock = socket.socket(af, socktype, proto)
+    except OSError as msg:
+        # failed to create a socket
+        sock = None
+        continue
+    try:
+        sock.connect(sa)
+    except OSError as msg:
+        # failed to connect to the socket
+        sock.close()
+        sock = None
+        continue
+    break
+# If we could not open a socket, exit
+if sock is None:
+    print("could not open socket")
+    sys.exit(1)
+# Send the GET request
+with sock:
     request = f"GET / HTTP/1.1\r\nHost: {host}\r\n\r\n"
-    sock.sendall(request.encode())
-
+    sock.send(request.encode())
     response = sock.recv(1024).decode()
-    print(response)
-
-
-if __name__ == "__main__":
-    main()
+print(response)

@@ -35,7 +35,7 @@ if sock is None:
     sys.exit(1)
 # Send the GET request
 with sock:
-    request = f"GET / HTTP/1.1\r\nHost: {host}\r\n\r\n"
+    request = "GET / HTTP/1.1\r\nHost: {}\r\n\r\n".format(host)
     sock.send(request.encode())
     response = sock.recv(1024).decode()
 print(response)

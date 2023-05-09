@@ -1,6 +1,5 @@
 # based on https://docs.python.org/3/library/socket.html
 import sys
-import sys
 import socket
 
 port = None
@@ -40,10 +39,8 @@ if sock is None:
     sys.exit(1)
 
 # Accept connections and send the HTML response
-try:
-    while True:
-        conn, addr = sock.accept()
-        with conn:
-            conn.sendall(response.encode())
-finally:
-    sock.close()
+conn, addr = sock.accept()
+with conn:
+    conn.sendall(response.encode())
+
+sock.close()
